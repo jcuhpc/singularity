@@ -1,7 +1,7 @@
 # singularity
 A repository for singularity definition (&amp; image) files.
 
-This repository also contains a script and "metadata" files that builds a conda environment inside a singularity container.
+This repository will contain a script and "metadata" files for creation of singularity container(s) with an embedded conda environment.
 This environment was used to create 122 singularity containers by first creating definition files.
 This environment was created by JCU HPC staff for internal use.
 Use of Singularity HPC may be a better choice for others.
