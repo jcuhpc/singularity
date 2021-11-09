@@ -10,7 +10,7 @@ on anaconda.org in attempt to detect latest version available.  In time,
 an ability to support automatic/scheduled installation of new versions
 will be built in.
 
-This respository also house singularity definition files for creation
+This respository also houses singularity definition files for creation
 of containers which do not house a conda environment.
 
 Development of this repository is primarily for internal JCU use.  If
