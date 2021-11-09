@@ -1,0 +1,17 @@
+# Common modulefile for SWNAME
+# The following variable must be set
+#     version:  an available version of abyss
+
+proc ModulesHelp { } {
+    global version
+    puts stderr "
+SWNAME - SWDESC
+Version: $version
+  
+Website: SWSITE\n
+"
+}
+
+module-whatis "SWNAME version $version"
+
+conflict SWNAME
