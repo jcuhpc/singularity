@@ -7,7 +7,8 @@ embedded conda environment.  This repository was used to rapidly create
 100+ singularity containers for JCU.  In most cases, a version for software
 is not required for container build - this environment will use metadata
 on anaconda.org in attempt to detect latest version available.  In time,
-an ability to automatically install new versions will be built in.
+an ability to support automatic/scheduled installation of new versions
+will be built in.
 
 This respository also house singularity definition files for creation
 of containers which do not house a conda environment.
