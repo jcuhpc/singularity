@@ -1,5 +1,5 @@
 # singularity
-A repository for singularity definition (&amp; image) files.
+A JCU repository for singularity container builds.
 
 This repository will contain a script and "metadata" files for creation of singularity container(s) with an embedded conda environment.
 This environment was used to create 122 singularity containers by first creating definition files.
