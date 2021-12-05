@@ -1,4 +1,5 @@
 #!/bin/bash
+# Creation of a container based on Ubuntu 21.04
 #####  MODIFICATIONS LIKELY TO BE REQUIRED IN THIS SECTION  #####
 
 # Directory housing singularity definition file templates.

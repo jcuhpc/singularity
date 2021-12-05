@@ -7,11 +7,8 @@
 # conda package name and a template file name (space separated).
 META=/sw/BUILD/metadata
 
-# Directory where created singularity definition files will be placed.
-SDFD=/tmp
-
 # Directory where singularity image files will be placed.
-INST=/sw/containers
+INST=/sw/containers/
 
 ##### MODIFICATIONS UNLIKELY TO BE REQUIRED IN THIS SECTION #####
 
@@ -31,7 +28,10 @@ if [ $# -eq 1 -o $# -eq 2 ] ; then
     # Create singularity definition file
     cat $TEMP | sed -e s/SWNAME/$SOFT/g | sed -e s/SWVERS/$VERS/g >/tmp/$SOFT.def
     # Build singularity container
-    sudo singularity build $INST/$SOFT-$VERS.sif $SDFD/$SOFT.def
+    sudo singularity build /tmp/$SOFT-$VERS.sif /tmp/$SOFT.def
+    cp /tmp/$SOFT-$VERS.sif $INST
+    rm -f /tmp/$SOFT-$VERS.sif
+
 else
     echo ""
     echo "Syntax:  conda-container <sw_name> [<sw_vers>]"

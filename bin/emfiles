@@ -1,4 +1,8 @@
 #!/bin/bash
+if [ $# -ne 2 ] ; then
+  echo "Syntax:  emfiles <sw_name> <sw_vers>"
+  exit 1
+fi
 #####  MODIFICATIONS LIKELY TO BE REQUIRED IN THIS SECTION  #####
 
 # Directory under which environment module files will be placed.
