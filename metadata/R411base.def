@@ -25,6 +25,9 @@ echo "export R_VERSION=${R_VERSION}" >> $SINGULARITY_ENVIRONMENT
 install -d -m 2775 -o root -g root /gpfs01
 install -d -m 1777 -o root -g root /scratch /fast/tmp
 
+#set local mirror and security
+echo deb "http://au.archive.ubuntu.com/ubuntu focal main" > /etc/apt/sources.list
+echo deb "http://security.ubuntu.com/ubuntu/ focal-security main" >> /etc/apt/sources.list
 
 # Get dependencies
 apt-get update

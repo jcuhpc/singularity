@@ -7,29 +7,29 @@
 # conda package name and a template file name (space separated).
 META=/sw/BUILD/metadata
 
-# Directory where singularity image files will be placed.
-INST=/sw/containers
-
 # Directory where created singularity definition files will be placed.
 SDFD=/tmp
+
+# Directory where singularity image files will be placed.
+INST=/sw/containers
 
 ##### MODIFICATIONS UNLIKELY TO BE REQUIRED IN THIS SECTION #####
 
 if [ $# -eq 1 -o $# -eq 2 ] ; then
     SOFT=$1
 
-    # Determine template file & 'primary' conda channel
+    # Determine template file & primary conda channel
     CHNL=`grep ^$SOFT\  $META/channels | awk '{print $2}'`
     TEMP=$META/$CHNL
     [[ -f $META/$SOFT ]]   &&   TEMP=$META/$SOFT
     [[ "$CHNL" =~ "bioconda" ]]   &&   CHNL=bioconda   # Fix for use of bioconda# template files.
 
-    # Determine version to install, if not supplied.
+    # Determine version to install
     VERS=$2   # Specify version when 'badges' data doesn't point to latest version.
     [[ $# -eq 1 ]]   &&   VERS=`curl https://anaconda.org/$CHNL/$SOFT/badges/version.svg 2>/dev/null | grep Anaconda.org | awk -F\- '{print $2}'`
 
     # Create singularity definition file
-    cat $TEMP | sed -e s/SWNAME/$SOFT/g | sed -e s/SWVERS/$VERS/g >$SDFD/$SOFT.def
+    cat $TEMP | sed -e s/SWNAME/$SOFT/g | sed -e s/SWVERS/$VERS/g >/tmp/$SOFT.def
     # Build singularity container
     sudo singularity build $INST/$SOFT-$VERS.sif $SDFD/$SOFT.def
 else

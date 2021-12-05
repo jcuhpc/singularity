@@ -1,0 +1,60 @@
+#!/bin/bash
+#####  MODIFICATIONS LIKELY TO BE REQUIRED IN THIS SECTION  #####
+
+# Directory under which environment module files will be placed.
+MDIR=/sw/modules
+
+# Directory housing singularity image files.
+CDIR=/sw/containers
+
+##### MODIFICATIONS UNLIKELY TO BE REQUIRED IN THIS SECTION #####
+pushd $CDIR
+mkdir -p $MDIR/$1
+
+MF="$MDIR/$1/$2"
+AF="$MDIR/$1/aliases"
+# Don't overwrite existing files.
+[[ -f $MF ]]   &&   MF="/sw/modules/$1/$2s"
+
+singularity run $1-$2.sif test -d /opt/conda
+if [ $? -eq 1 ] ; then
+  # Ubuntu (u??04-container scripts) based container installation
+  CMDS=`singularity run $1-$2.sif dpkg -L $1 2>/dev/null | grep \/usr\/bin\/ | sed -e 's@/usr/bin/@@'`
+  if [ "$CMDS" = "" ] ; then
+    # Assumes software manually installed under /opt inside containear
+    CMDS=`singularity run $1-$2.sif find /opt -type f -executable | awk -F\/ '{print $NF}'`
+    if [ "$CMDS" = "" ] ; then
+      # Assumes software manually installed under /usr/local inside container
+      CMDS=`singularity run $1-$2.sif find /usr/local -type f -executable | awk -F\/ '{print $NF}'`
+    fi
+  fi
+else
+  # Miniconda (conda-container script) based container installation
+  CMDS=`singularity run $1-$2.sif find /opt/conda/pkgs -maxdepth 1 -name $1-$2\* -type d`
+  CMDS=`singularity run $1-$2.sif ls $CMDS/bin`
+fi
+
+if [ ! -f $MF ] ; then
+  printf "#%%Module\n"				> $MF
+  printf "set sw_name $1\n"			>>$MF
+  printf "set sw_vers $2\n"			>>$MF
+  printf "set sw_site \"\"\n"			>>$MF
+  printf "set moduledir [file dirname \$ModulesCurrentModulefile]\n" >>$MF
+  printf "source \$moduledir/../common\n"	>>$MF
+  printf "source \$moduledir/../container\n"	>>$MF
+  printf "source \$moduledir/aliases\n"		>>$MF
+fi
+
+if [ ! -f $AF ] ; then
+  printf "# SIF is defined in ../container\n"		> $AF
+  for X in $CMDS ; do
+    printf "set-alias $X\t\"singularity run \$SIF $X\"\n"	>>$AF
+  done
+else
+  printf "# Below would have been placed in $AF, if it didn\'t exist.\n"
+  for X in $CMDS ; do
+    printf "set-alias $X\t\"singularity run \$SIF $X\"\n"
+  done
+fi
+
+popd

@@ -1,5 +1,5 @@
 Bootstrap: localimage
-From: /sw/BUILD/testR-4.1.1.sif
+From: /fast/sw/containers/R-4.1.1.sif
 
 
 %apprun R

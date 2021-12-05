@@ -1,0 +1,32 @@
+#!/bin/bash
+#####  MODIFICATIONS LIKELY TO BE REQUIRED IN THIS SECTION  #####
+
+# Directory housing singularity definition file templates.
+META=/sw/BUILD/metadata
+
+# Directory where created singularity definition files will be placed.
+SDFD=/tmp
+
+# Directory where singularity image files will be placed.
+INST=/sw/containers
+
+##### MODIFICATIONS UNLIKELY TO BE REQUIRED IN THIS SECTION #####
+
+if [ $# -eq 1 -o $# -eq 2 ] ; then
+    SOFT=$1
+
+    # Determine version to install
+    VERS=$2   # Allow user to specify a version.
+    [[ $# -eq 1 ]]   &&   VERS=`curl https://packages.ubuntu.com/focal/$SOFT 2>/dev/null | awk -F[\(\)] '/Package:/{print $2}' | awk -F[-+] '{print $1}'`
+
+    # Create singularity definition file
+    cat $META/ubuntu-20.04-base.template | sed -e s/SWNAME/$SOFT/g >$SDFD/$SOFT.def
+
+    # Build singularity container
+    sudo singularity build $INST/$SOFT-$VERS.sif $SDFD/$SOFT.def
+else
+    echo ""
+    echo "Syntax:  ubuntu-container <sw_name> [<sw_vers>]"
+    echo ""
+    exit 1
+fi
