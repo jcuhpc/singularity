@@ -1,21 +1,41 @@
 # singularity
 A JCU repository for singularity container builds.
 
-This repository, created by JCU HPC staff, should contain a script and
-"metadata" files for creation of singularity container(s) with an
-embedded conda environment.  This repository was used to rapidly create
-100+ singularity containers for JCU.  In most cases, a version for software
-is not required for container build - this environment uses metadata on
-anaconda.org in attempt to detect latest version available.  In time,
-an ability to support automatic/scheduled installation of new versions
-will be built in (success dependent on metadata in anaconda.org).
+This repository, created by JCU HPC staff, should contain a few scripts
+and a number of "metadata" files (e.g., singularity definition file
+templates) for creation of singularity container(s).  Containers built
+using this repository are based on Ubuntu or Miniconda bases.  The
+scripts & metadata have been used to create 300+ singularity containers
+and environment module files for JCU with an average human time
+investment of <20s per container.
 
-This respository also houses singularity definition files for creation
-of containers which do not house a conda environment.
+Use of Singularity HPC may be a better choice for many/most people.
+However, I found the cost (human time) of SHPC to be high when viewed
+across hundreds of application/workflow based containers that I have
+been building to replace more traditional installs.  Sustainable support
+for "Reproducible Research" on JCU HPC systems has been the driver.
 
-Development of this repository is primarily for internal JCU use.  If
-it works for you, we would appeciate hearing reports of "container
-works".  If it doesn't work for you, we cannot provide any guarantee
-on response time to constructive feedback.
+In most cases, if you are looking to install the "latest" conda/ubuntu
+packaged version, you will not need to specify a version to build a
+container using the scripts provided here.  The scripts use metadata
+on anaconda.org and/or packages.ubuntu.com in an attempt to detect the
+latest verion available.
 
-Use of Singularity HPC may be a better choice for others.
+This respository also houses some singularity definition files for
+container creation that lies beyond the capabilities of MVP scripts
+that can be found here.
+
+In time, an ability to support automatic/scheduled installation of
+new versions will be built in, where possible.
+
+NOTE:  HPC system administrators have built this repository.
+Development of software does not appear anywhere in our PDs.
+If the contents of this repository work for you, we would
+would appeciate hearing reports of "container works" from a
+research use point of view.  We accept constructive feeback,
+but cannot provide any guarantee of bug fixes or updates.
+
+REPOSITORY CREATORS
+Dr. Wayne Mallett
+Mr. Wayne Spagnol
+
