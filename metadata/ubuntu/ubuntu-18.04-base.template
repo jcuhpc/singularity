@@ -1,0 +1,17 @@
+Bootstrap: docker
+From: ubuntu:18.04
+
+%labels
+Maintainer JCUHPC
+
+%runscript
+exec "$@"
+
+%post
+install -d -m 2775 -o root -g root /gpfs01
+install -d -m 1777 -o root -g root /scratch /fast/tmp
+
+apt-get update
+apt-get install -y --no-install-recommends software-properties-common
+apt-get install -y SWNAME
+

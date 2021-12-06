@@ -135,6 +135,7 @@ orthofinder bioconda
 
 pal2nal bioconda
 paml bioconda
+pandas conda-forge
 pandoc conda-forge
 parallel conda-forge
 pbipa bioconda

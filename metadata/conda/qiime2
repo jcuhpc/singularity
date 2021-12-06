@@ -1,13 +1,12 @@
-Bootstrap: localimage
-
-From: /fast/BUILD/bin/miniconda3.sif
+Bootstrap: docker
+From: continuumio/miniconda3
 
 %post
     install -d -m 2775 -o root -g root /gpfs01
     install -d -m 1777 -o root -g root /scratch /fast/tmp
     export PATH="/opt/conda/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
     conda update conda
-    conda create --debug -c fastai -c defaults -n SWNAME SWNAME=SWVERS
+    conda create --debug -c qiime2 -c conda-forge -c defaults -n SWNAME SWNAME=SWVERS
     . /opt/conda/etc/profile.d/conda.sh
     conda activate SWNAME
 

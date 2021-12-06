@@ -1,6 +1,5 @@
-Bootstrap: localimage
-
-From: /fast/BUILD/bin/miniconda3.sif
+Bootstrap: docker
+From: continuumio/miniconda3
 
 %post
     install -d -m 2775 -o root -g root /gpfs01

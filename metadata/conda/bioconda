@@ -1,6 +1,5 @@
-Bootstrap: localimage
-
-From: /fast/BUILD/bin/miniconda3.sif
+Bootstrap: docker
+From: continuumio/miniconda3
 
 %post
     install -d -m 2775 -o root -g root /gpfs01
@@ -10,7 +9,7 @@ From: /fast/BUILD/bin/miniconda3.sif
     conda config --add channels defaults
     conda config --add channels bioconda
     conda config --add channels conda-forge
-    conda create --debug -n graftm_genome graftm=SWVERS diamond hmmer krona mfqe orfm pplacer
+    conda create --debug -n SWNAME SWNAME=SWVERS
     . /opt/conda/etc/profile.d/conda.sh
     conda activate SWNAME
 
