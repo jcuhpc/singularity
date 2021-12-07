@@ -24,8 +24,8 @@ if [ $# -eq 2 ] ; then
     fi
 
     # Build singularity container
-    sudo singularity build /tmp/$SW-$2.def /tmp/$SW.def
-    cp /tmp/$SW-$2 $INST
+    sudo singularity build /tmp/$SW-$2.sif $META/$SW.def
+    cp /tmp/$SW-$2.sif $INST
     rm -f /tmp/$SW-$2.sif
 else
     echo ""
