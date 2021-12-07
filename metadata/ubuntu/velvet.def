@@ -1,0 +1,22 @@
+Bootstrap: docker
+From: ubuntu:20.04
+
+%labels
+Maintainer JCUHPC
+
+%runscript
+exec "$@"
+
+%post
+install -d -m 2775 -o root -g root /gpfs01
+install -d -m 1777 -o root -g root /scratch /fast/tmp
+
+#set local mirror and security
+echo deb "http://au.archive.ubuntu.com/ubuntu focal main" > /etc/apt/sources.list
+echo deb "http://security.ubuntu.com/ubuntu/ focal-security main" >> /etc/apt/sources.list
+
+apt-get update
+apt-get install -y --no-install-recommends software-properties-common
+apt-get install -y build-essential wget bzip2 ca-certificates libglib2.0-0 libxext6 libsm6 libxrender1 git
+apt-get install -y velvet velvetoptimiser
+

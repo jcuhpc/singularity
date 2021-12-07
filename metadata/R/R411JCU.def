@@ -379,6 +379,14 @@ R --slave -e 'library(AmpGram);install_AmpGramModel()'
 #added 9-11-2021
 R --slave -e 'require(devtools);install_github("uyedaj/bayou");require(bayou)'
 
+#added 24-11-2021
+R --slave -e 'install.packages("dartR")'
+R --slave -e 'install.packages("LEA")'
+R --slave -e 'install.packages("gdm")'
+R --slave -e 'install.packages("fmsb")'
+R --slave -e 'install.packages("yhat")'
+R --slave -e 'install.packages("ecodist")'
+
 # Add a default CRAN mirror
 echo "options(repos = c(CRAN = 'https://cran.rstudio.com/'), download.file.method = 'libcurl')" >> /usr/lib/R/etc/Rprofile.site
 

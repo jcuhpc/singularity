@@ -10,21 +10,26 @@ INST=/sw/containers/
 
 ##### MODIFICATIONS UNLIKELY TO BE REQUIRED IN THIS SECTION #####
 
-if [ $# -eq 1 -o $# -eq 2 ] ; then
-    SOFT=$1
+if [ $# -eq 2 ] ; then
+    SW=$1
 
-    VERS=$2   # Allow user to specify a version.
-
-    # Create singularity definition file
-    cat $META/ubuntu-22.04-base.template | sed -e s/SWNAME/$SOFT/g >/tmp/$SOFT.def
+    # Singularity definition file
+    if   [ -f $META/ubuntu/$SW ] ; then
+      SDF="$META/ubuntu/$SW.def"
+    elif [ -f $META/ubuntu/$SW-$2.def ] ; then
+      SDF="$META/ubuntu/$SW-$2.def"
+    else
+      echo "Singularity definition file cannot be found."
+      exit 1
+    fi
 
     # Build singularity container
-    sudo singularity build /tmp/$SOFT-$VERS.sif /tmp/$SOFT.def
-    cp /tmp/$SOFT-$VERS.sif $INST
-    rm -f /tmp/$SOFT-$VERS.sif
+    sudo singularity build /tmp/$SW-$2.def /tmp/$SW.def
+    cp /tmp/$SW-$2 $INST
+    rm -f /tmp/$SW-$2.sif
 else
     echo ""
-    echo "Syntax:  ubuntu-container <sw_name> [<sw_vers>]"
+    echo "Syntax:  custom-container <sw_name> <sw_vers>"
     echo ""
     exit 1
 fi
