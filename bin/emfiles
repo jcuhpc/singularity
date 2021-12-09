@@ -5,21 +5,35 @@ if [ $# -ne 2 ] ; then
 fi
 #####  MODIFICATIONS LIKELY TO BE REQUIRED IN THIS SECTION  #####
 
+# Software sites metadata file locaiton.
+META=/sw/BUILD/metadata/swsites
+
 # Directory under which environment module files will be placed.
-MDIR=/sw/modules
+MDIR=/sw/modules/$1
 
 # Directory housing singularity image files.
 CDIR=/sw/containers
 
 ##### MODIFICATIONS UNLIKELY TO BE REQUIRED IN THIS SECTION #####
 pushd $CDIR
-mkdir -p $MDIR/$1
+mkdir -p $MDIR
+SITE=`grep ^$1\  $META | awk '{print $2}'`
+[[ "$SITE" = "" ]]   &&   echo "WARNING: $META file does not contain information for $1!"
 
-MF="$MDIR/$1/$2"
-AF="$MDIR/$1/aliases"
-# Don't overwrite existing files.
-[[ -f $MF ]]   &&   MF="/sw/modules/$1/$2s"
+if [ ! -f $MDIR/swinfo ] ; then
+  printf "# Common modulefile for HPC software\n"   >$MDIR/swinfo
+  printf "set sw_name $1\nset sw_site \"$SITE\"\n" >>$MDIR/swinfo
+fi
 
+printf "#%%Module\nset sw_vers $2\n"		 >/tmp/$1-$2
+printf "set moduledir [file dirname \$ModulesCurrentModulefile]\n" >>/tmp/$1-$2
+printf "source \$moduledir/swinfo\n"		>>/tmp/$1-$2
+printf "source \$moduledir/../common\n"		>>/tmp/$1-$2
+printf "source \$moduledir/../container\n"	>>/tmp/$1-$2
+printf "source \$moduledir/aliases\n"		>>/tmp/$1-$2
+install -m 664-o sci-wam -g hpc-admins /tmp/$1-$2 $MDIR/$2
+
+# Identify aliases that will be made available (automatically).
 singularity run $1-$2.sif test -d /opt/conda
 if [ $? -eq 1 ] ; then
   # Ubuntu (u??04-container scripts) based container installation
@@ -38,27 +52,22 @@ else
   CMDS=`singularity run $1-$2.sif ls $CMDS/bin`
 fi
 
-if [ ! -f $MF ] ; then
-  printf "#%%Module\n"				> $MF
-  printf "set sw_name $1\n"			>>$MF
-  printf "set sw_vers $2\n"			>>$MF
-  printf "set sw_site \"\"\n"			>>$MF
-  printf "set moduledir [file dirname \$ModulesCurrentModulefile]\n" >>$MF
-  printf "source \$moduledir/../common\n"	>>$MF
-  printf "source \$moduledir/../container\n"	>>$MF
-  printf "source \$moduledir/aliases\n"		>>$MF
-fi
+printf "# SIF is defined in ../container\n" >/tmp/aliases
+for X in $CMDS ; do
+  printf "set-alias $X\t\"singularity run \$SIF $X\"\n" >>/tmp/aliases
+done
 
-if [ ! -f $AF ] ; then
-  printf "# SIF is defined in ../container\n"		> $AF
-  for X in $CMDS ; do
-    printf "set-alias $X\t\"singularity run \$SIF $X\"\n"	>>$AF
-  done
+if [ ! -f $MDIR/aliases ] ; then
+    install -m 664-o sci-wam -g hpc-admins /tmp/aliases $MDIR/
 else
-  printf "# Below would have been placed in $AF, if it didn\'t exist.\n"
-  for X in $CMDS ; do
-    printf "set-alias $X\t\"singularity run \$SIF $X\"\n"
-  done
+    MSG=`diff $MDIR/aliases /tmp/aliases`
+    if [ $? -eq 1 ] ; then
+        echo ""
+	echo "Alias mismatch found!  Suggested aliases file is:"
+        cat /tmp/aliases
+        echo ""
+    fi
 fi
+rm -f /tmp/aliases
 
 popd
