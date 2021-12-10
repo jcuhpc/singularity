@@ -33,6 +33,7 @@ bowtie2 bowtie-bio.sourceforge.net/bowtie2/index.shtml
 busco gitlab.com/ezlab/busco
 BWA bio-bwa.sourceforge.net
 bzip2 sourceforge.net/projects/bzip2
+canu github.com/marbl/canu
 CAP3 faculty.sites.iastate.edu/xqhuang/cap3-and-pcap-sequence-and-genome-assembly-programs
 cd-hit github.com/weizhongli/cdhit
 cloog cloog.org
@@ -184,6 +185,7 @@ spades cab.spbu.ru/files/release3.12.0/manual.html
 sparsehash github.com/sparsehash/sparsehash
 sratoolkit www.ncbi.nlm.nih.gov/sra/
 stacks catchenlab.life.illinois.edu/stacks/
+star github.com/alexdobin/STAR
 stringtie ccb.jhu.edu/software/stringtie/#install
 structure web.stanford.edu/group/pritchardlab/structure.html
 tar www.gnu.org/software/tar/

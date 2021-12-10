@@ -25,13 +25,13 @@ if [ ! -f $MDIR/swinfo ] ; then
   printf "set sw_name $1\nset sw_site \"$SITE\"\n" >>$MDIR/swinfo
 fi
 
-printf "#%%Module\nset sw_vers $2\n"		 >/tmp/$1-$2
-printf "set moduledir [file dirname \$ModulesCurrentModulefile]\n" >>/tmp/$1-$2
-printf "source \$moduledir/swinfo\n"		>>/tmp/$1-$2
-printf "source \$moduledir/../common\n"		>>/tmp/$1-$2
-printf "source \$moduledir/../container\n"	>>/tmp/$1-$2
-printf "source \$moduledir/aliases\n"		>>/tmp/$1-$2
-install -m 664-o sci-wam -g hpc-admins /tmp/$1-$2 $MDIR/$2
+printf "#%%Module\nset sw_vers $2\n"		 >/tmp/$2
+printf "set moduledir [file dirname \$ModulesCurrentModulefile]\n" >>/tmp/$2
+printf "source \$moduledir/swinfo\n"		>>/tmp/$2
+printf "source \$moduledir/../common\n"		>>/tmp/$2
+printf "source \$moduledir/../container\n"	>>/tmp/$2
+printf "source \$moduledir/aliases\n"		>>/tmp/$2
+install -m 664 -o sci-wam -g hpc-admins /tmp/$2 $MDIR/
 
 # Identify aliases that will be made available (automatically).
 singularity run $1-$2.sif test -d /opt/conda
@@ -58,7 +58,7 @@ for X in $CMDS ; do
 done
 
 if [ ! -f $MDIR/aliases ] ; then
-    install -m 664-o sci-wam -g hpc-admins /tmp/aliases $MDIR/
+    install -m 664 -o sci-wam -g hpc-admins /tmp/aliases $MDIR/
 else
     MSG=`diff $MDIR/aliases /tmp/aliases`
     if [ $? -eq 1 ] ; then
@@ -68,6 +68,6 @@ else
         echo ""
     fi
 fi
-rm -f /tmp/aliases
+rm -f /tmp/aliases /tmp/$2
 
 popd
