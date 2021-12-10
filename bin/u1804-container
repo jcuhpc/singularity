@@ -3,7 +3,7 @@
 #####  MODIFICATIONS LIKELY TO BE REQUIRED IN THIS SECTION  #####
 
 # Directory housing singularity definition file templates.
-META=/sw/BUILD/metadata/ubuntu
+META=/sw/apptainer/metadata/ubuntu
 
 # Directory where singularity image files will be placed.
 INST=/sw/containers/

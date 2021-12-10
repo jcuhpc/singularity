@@ -6,7 +6,7 @@ fi
 #####  MODIFICATIONS LIKELY TO BE REQUIRED IN THIS SECTION  #####
 
 # Software sites metadata file locaiton.
-META=/sw/BUILD/metadata/swsites
+META=/sw/apptainer/metadata/swsites
 
 # Directory under which environment module files will be placed.
 MDIR=/sw/modules/$1

@@ -3,7 +3,7 @@
 #####  MODIFICATIONS LIKELY TO BE REQUIRED IN THIS SECTION  #####
 
 # Directory housing singularity definition file templates.
-META=/sw/BUILD/metadata
+META=/sw/apptainer/metadata
 
 # Directory where singularity image files will be placed.
 INST=/sw/containers/
@@ -24,7 +24,7 @@ if [ $# -eq 2 ] ; then
     fi
 
     # Build singularity container
-    sudo singularity build /tmp/$SW-$2.sif $META/$SW.def
+    sudo singularity build /tmp/$SW-$2.sif $SDF
     cp /tmp/$SW-$2.sif $INST
     rm -f /tmp/$SW-$2.sif
 else
