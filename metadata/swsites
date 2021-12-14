@@ -47,6 +47,7 @@ diamond github.com/bbuchfink/diamond
 D dlang.org
 ed www.gnu.org/software/ed/
 emacs www.gnu.org/software/emacs/
+ems github.com/csiro-coasts/EMS
 ExaBayes cme.h-its.org
 fasta fasta.bioch.virginia.edu/fasta_www2/fasta_down.shtml
 fastp github.com/OpenGene/fastp
@@ -172,6 +173,8 @@ rstudio rstudio.com
 ruby www.ruby-lang.org/en/
 salmon github.com/COMBINE-lab/salmon
 samtools www.htslib.org
+scalpel scalpel.sourceforge.net
+scikit-learn scikit-learn.org
 seadas seadas.gsfc.nasa.gov
 secretomep services.healthtech.dtu.dk/service.php?SecretomeP-2.0
 sed www.gnu.org/software/sed/
@@ -183,11 +186,16 @@ slim messerlab.org/slim/
 soapnuke github.com/BGI-flexlab/SOAPnuke
 spades cab.spbu.ru/files/release3.12.0/manual.html
 sparsehash github.com/sparsehash/sparsehash
-sratoolkit www.ncbi.nlm.nih.gov/sra/
+sqlite www.sqlite.org
+sqlite3 www.sqlite.org
+sra-toolkit www.ncbi.nlm.nih.gov/sra/
+sra-tools www.ncbi.nlm.nih.gov/sra/
+srst2 github.com/katholt/srst2
 stacks catchenlab.life.illinois.edu/stacks/
 star github.com/alexdobin/STAR
 stringtie ccb.jhu.edu/software/stringtie/#install
 structure web.stanford.edu/group/pritchardlab/structure.html
+swig swig.org
 tar www.gnu.org/software/tar/
 termcap www.gnu.org/software/termutils/
 tiger bitbucket.org/wegmannlab/tiger/wiki/Home
@@ -200,6 +208,7 @@ trimmomatic www.usadellab.org/cms/?page=trimmomatic
 trinity github.com/trinityrnaseq/trinityrnaseq
 trinityrnaseq github.com/trinityrnaseq/trinityrnaseq
 trinotate trinotate.github.io
+ucsc-software genome.ucsc.edu
 units www.gnu.org/software/units/
 vcflib github.com/vcflib/vcflib
 vcftools vcftools.sourceforge.net

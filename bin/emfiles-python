@@ -1,6 +1,6 @@
 #!/bin/bash
 if [ $# -ne 2 ] ; then
-  echo "Syntax:  emfiles <sw_name> <sw_vers>"
+  echo "Syntax:  emfiles-python <sw_name> <sw_vers>"
   exit 1
 fi
 #####  MODIFICATIONS LIKELY TO BE REQUIRED IN THIS SECTION  #####
@@ -31,29 +31,9 @@ printf "source \$moduledir/../container\n"	>>/tmp/$2
 printf "source \$moduledir/aliases\n"		>>/tmp/$2
 install -m 664 -o sci-wam -g hpc-admins /tmp/$2 $MDIR/
 
-# Identify aliases that will be made available (automatically).
-singularity run $1-$2.sif test -d /opt/conda
-if [ $? -eq 1 ] ; then
-  # Ubuntu (u??04-container scripts) based container installation
-  CMDS=`singularity run $1-$2.sif dpkg -L $1 2>/dev/null | grep \/usr\/bin\/ | sed -e 's@/usr/bin/@@'`
-  if [ "$CMDS" = "" ] ; then
-    # Assumes software manually installed under /opt inside containear
-    CMDS=`singularity run $1-$2.sif find /opt -type f -executable | awk -F\/ '{print $NF}'`
-    if [ "$CMDS" = "" ] ; then
-      # Assumes software manually installed under /usr/local inside container
-      CMDS=`singularity run $1-$2.sif find /usr/local -type f -executable | awk -F\/ '{print $NF}'`
-    fi
-  fi
-else
-  # Miniconda (conda-container script) based container installation
-  CMDS=`singularity run $1-$2.sif find /opt/conda/pkgs -maxdepth 1 -name $1-$2\* -type d`
-  CMDS=`singularity run $1-$2.sif ls $CMDS/bin`
-fi
-
 printf "# SIF is defined in ../container\n" >/tmp/aliases
-for X in $CMDS ; do
-  printf "set-alias $X\t\"singularity run \$SIF $X\"\n" >>/tmp/aliases
-done
+printf "set-alias python\t\"singularity run \$SIF python\"\n"   >>/tmp/aliases
+printf "set-alias python3\t\"singularity run \$SIF python3\"\n" >>/tmp/aliases
 
 if [ ! -f $MDIR/aliases ] ; then
     install -m 664 -o sci-wam -g hpc-admins /tmp/aliases $MDIR/
