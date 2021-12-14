@@ -1,0 +1,77 @@
+#!/bin/bash
+# Creation of a Ubuntu 22.04 based apptainer
+
+# Directory housing singularity definition file templates.
+META=/sw/apptainer/metadata/ubuntu
+
+# Directory where singularity image files will be placed.
+INST=/sw/containers/
+
+if [ $# -eq 0 ] ; then
+    # Brief syntax message.
+    echo "Syntax:  ubuntu-container <pkg0> [-d <dist>] [-n <name>] [-v <vers>] [-x <pkg1> [-x <pkg2>] ...]"
+    echo "	<pkg0> = Primary software package"
+    echo "	<dist> = Ubuntu version used (def: 22.04)"
+    echo "	<name> = Base name used for container image file"
+    echo "	<vers> = Version used in container image file name"
+    echo "	<pkg#> = Extra software packages required to be installed"
+    echo ""
+    echo "Options will not be required for most container creations."
+    echo "Packages <pkg0> depends upon will be installed automatically."
+    echo ""
+    exit 1
+else
+    # Process arguments & options.
+    N=$1
+    S=$1
+    X=""
+    shift
+    D="22.04"
+    while [[ $# -gt 0 ]] ; do
+	opt="$1"
+	case $opt in
+	    -d)
+		D="$2"
+		shift
+		shift
+		;;
+	    -n)
+		N="$2"
+		shift
+		shift
+		;;
+	    -v)
+		C="$2"
+		shift
+		shift
+		;;
+	    -x)
+		X="$X $2"
+		shift
+		shift
+		;;
+	    *)
+		echo "Option $1 unknown, ignoring!"
+		shift
+		;;
+	esac
+    done
+fi
+
+# Auto-detect version of primary software package
+[[ "$D" = "22.04" ]]   &&   U="jammy"
+[[ "$D" = "21.04" ]]   &&   U="hirsute"
+[[ "$D" = "20.04" ]]   &&   U="focal"
+[[ "$D" = "18.04" ]]   &&   U="bionic"
+V=`curl https://packages.ubuntu.com/$U/$S 2>/dev/null | awk -F[\(\)] '/Package:/{print $2}' | awk -F[-+] '{print $1}'`
+[[ "$C" = "" ]]   &&   C=$V
+
+# Create singularity definition file
+F="$META/ubuntu-$D-base.template"
+[[ ! -f $F ]]   &&   echo "ERROR: $F doesn't exist!"   &&   exit 1
+cat $F | sed -e s/SWNAME/$S/g >/tmp/$N.def
+
+# Build singularity container
+sudo singularity build /tmp/$N-$C.sif /tmp/$N.def
+cp /tmp/$N-$C.sif $INST
+rm -f /tmp/$N-$C.sif
