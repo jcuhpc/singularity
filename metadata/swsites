@@ -133,6 +133,8 @@ netphos services.healthtech.dtu.dk/service.php?NetPhos-3.1
 nettle www.lysator.liu.se/~nisse/nettle/
 NGSadmix www.popgen.dk/software/index.php/NgsAdmix
 nlopt nlopt.readthedocs.io/en/latest/
+oases github.com/dzerbino/oases
+octave www.octave.org
 onedrive github.com/abraunegg/onedrive
 openblas www.openblas.net
 openmpi www.open-mpi.org
