@@ -6,16 +6,16 @@ Maintainer JCUHPC(based on (Jeremy Nicklas)
 R_Version 4.1.1
 
 
-%apprun R
-exec R "${@}"
+#%apprun R
+#exec R "${@}"
 
 
-%apprun Rscript
-exec Rscript "${@}"
+#%apprun Rscript
+#exec Rscript "${@}"
 
 
 %runscript
-exec R "${@}"
+exec "$@"
 
 
 %post
@@ -26,13 +26,12 @@ install -d -m 2775 -o root -g root /gpfs01
 install -d -m 1777 -o root -g root /scratch /fast/tmp
 
 #set local mirror and security
-echo deb "http://au.archive.ubuntu.com/ubuntu focal main" > /etc/apt/sources.list
-echo deb "http://security.ubuntu.com/ubuntu/ focal-security main" >> /etc/apt/sources.list
+#echo deb "http://au.archive.ubuntu.com/ubuntu focal main" > /etc/apt/sources.list
+#echo deb "http://security.ubuntu.com/ubuntu/ focal-security main" >> /etc/apt/sources.list
 
 # Get dependencies
 apt-get update
-apt-get install -y --no-install-recommends \
-locales
+apt-get install -y --no-install-recommends software-properties-common locales
 
 
 # Configure default locale

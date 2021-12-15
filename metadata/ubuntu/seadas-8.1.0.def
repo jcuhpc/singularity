@@ -13,7 +13,7 @@ install -d -m 1777 -o root -g root /scratch /fast/tmp
 
 apt-get update
 apt-get install -y --no-install-recommends software-properties-common
-apt-get install -y wget apt-utils tar
+apt-get install -y wget apt-utils tar openjdk-11-jdk
 cd /opt
 wget https://oceandata.sci.gsfc.nasa.gov/SeaDAS/installer/8.1.0/seadas_8.1.0_linux64_installer.sh
 wget https://oceandata.sci.gsfc.nasa.gov/manifest/install_ocssw
