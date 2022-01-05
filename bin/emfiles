@@ -85,7 +85,7 @@ printf "set moduledir [file dirname \$ModulesCurrentModulefile]\n" >>/tmp/$V
 printf "source \$moduledir/swinfo\n"	   >>/tmp/$V
 printf "source \$moduledir/../common\n"	   >>/tmp/$V
 printf "source \$moduledir/../container\n" >>/tmp/$V
-printf "source \$moduledir/aliases\n"	   >>/tmp/$V
+printf "source \$moduledir/aliases-$V\n"   >>/tmp/$V
 install -d -m 2775 -g hpc-admins $MODDIR/$C
 install -m 664 -g hpc-admins /tmp/$V /tmp/swinfo $MODDIR/$C/
 rm -f /tmp/$V /tmp/swinfo
@@ -134,16 +134,4 @@ for X in $CMDS ; do
   printf "set-alias $X\t\"singularity run \$SIF $X\"\n" >>/tmp/aliases
 done
 
-if [ ! -f $MODDIR/aliases ] ; then
-    install -m 664 -g hpc-admins /tmp/aliases $MODDIR/
-else
-    # Don't overwrite existing aliases file.
-    MSG=`diff $MODDIR/aliases /tmp/aliases`
-    if [ $? -eq 1 ] ; then
-	echo "Alias mismatch found!  Manual intervention required?"
-	echo "Suggested aliases file is:"
-        echo ""
-        cat /tmp/aliases
-        echo ""
-    fi
-fi
+install -m 664 -g hpc-admins /tmp/aliases $MODDIR/$C/aliases-$V

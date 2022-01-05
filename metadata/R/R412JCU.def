@@ -6,14 +6,6 @@ Maintainer JCUHPC(based on (Jeremy Nicklas)
 R_Version 4.1.2
 
 
-#%apprun R
-#exec R "${@}"
-
-
-#%apprun Rscript
-#exec Rscript "${@}"
-
-
 %runscript
 exec "$@"
 
@@ -28,22 +20,11 @@ install -d -m 1777 -o root -g root /scratch /fast/tmp
 
 # Get dependencies
 apt-get update
-apt-get install -y --no-install-recommends software-properties-common locales dirmngr
-
-
-# Configure default locale
-echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen
-locale-gen en_US.utf8
-/usr/sbin/update-locale LANG=en_US.UTF-8
-export LC_ALL=en_US.UTF-8
-export LANG=en_US.UTF-8
-
+apt-get install -y --no-install-recommends software-properties-common dirmngr
 
 # Install R
-apt-get update -qq
+apt-get update
 apt-get install -y --no-install-recommends \
-software-properties-common \
-dirmngr \
 wget
 wget -qO- https://cloud.r-project.org/bin/linux/ubuntu/marutter_pubkey.asc | tee -a /etc/apt/trusted.gpg.d/cran_ubuntu_key.asc
 #add-apt-repository "deb https://cloud.r-project.org/bin/linux/ubuntu $(lsb_release -cs)-cran40/"
@@ -61,6 +42,7 @@ libcairo2-dev \
 libxt-dev \
 libopenblas-dev \
 libnetcdf-dev \
+libgit2-dev \
 default-jre \
 libgdal-dev \
 libtool-bin \
@@ -369,6 +351,8 @@ R --slave -e 'install.packages("https://cran.r-project.org/src/contrib/Archive/s
 R --slave -e 'install.packages("https://cran.r-project.org/src/contrib/Archive/nws/nws_1.7.0.1.tar.gz", repos=NULL, type="source")'
 R --slave -e 'install.packages("https://cran.r-project.org/src/contrib/Archive/RSVGTipsDevice/RSVGTipsDevice_1.0-7.tar.gz", repos=NULL, type="source")'
 R --slave -e 'install.packages("https://cran.r-project.org/src/contrib/Archive/DMwR/DMwR_0.4.1.tar.gz", repos=NULL, type="source")'
+R --slave -e 'install.packages("terra")'
+R --slave -e 'install.packages("raster")'
 R --slave -e 'remotes::install_github("hypertidy/anglr")'
 R --slave -e 'library(AmpGram);install_AmpGramModel()'
 
@@ -376,6 +360,8 @@ R --slave -e 'library(AmpGram);install_AmpGramModel()'
 R --slave -e 'require(devtools);install_github("uyedaj/bayou");require(bayou)'
 
 #added 24-11-2021
+R --slave -e 'BiocManager::install("SNPRelate")'
+R --slave -e 'BiocManager::install("qvalue")'
 R --slave -e 'install.packages("dartR")'
 R --slave -e 'install.packages("LEA")'
 R --slave -e 'install.packages("gdm")'
