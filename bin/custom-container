@@ -14,7 +14,7 @@ if [ $# -eq 2 ] ; then
     SW=$1
 
     # Singularity definition file
-    if   [ -f $META/ubuntu/$SW ] ; then
+    if   [ -f $META/ubuntu/$SW.def ] ; then
       SDF="$META/ubuntu/$SW.def"
     elif [ -f $META/ubuntu/$SW-$2.def ] ; then
       SDF="$META/ubuntu/$SW-$2.def"

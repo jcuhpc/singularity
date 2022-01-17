@@ -1,137 +1,177 @@
 #!/bin/bash
-# Creation of module files to ease burden of apptainer use.
-# This script is written for people using Environment Modules.
-# https://modules.readthedocs.io/en/latest/index.html
+# Creation of environment module files to ease burden of apptainer use.
+# This script is written for https://modules.readthedocs.io/en/latest/index.html
 
-# Simple syntax check.
-if [ $# -lt 1 ] ; then
-    echo ""
-    echo "Syntax:  emfiles <path-to-SIF> [-m <path>] [-p] [-R]"
-    echo "	-m   speficy base path for module files (def: /sw/modules)"
-    echo "	-p   create aliases for python use"
-    echo "	-R   create aliases for R use"
-    echo "This script will create environment-modules files"
-    echo "associated with the apptainer file <path-to-SIF>"
-    echo ""
+function SyntaxMessage {
+    printf "\nSyntax:  emfiles <path-to-SIF> [OPTIONS]\n\n"
+    printf "This script will create environment-modules files\n"
+    printf "associated with the apptainer file <path-to-SIF>\n\n"
+    printf "OPTIONS:\n"
+    printf "\t-m <environment-modules path>\t(Def: /sw/modules)\n"
+    printf "\t-n <module name>\t\t(Def: extracted from <path-to-SIF>)\n"
+    printf "\t-d\t\t\tConfigure to be default version\n\n"
+    printf "Example:  emfiles /sw/containers/hdf5-tools-1.10.7.sif -n hdf5\n"
+    printf "\twill ensure that the environment modules files exist under /sw/modules/\n"
+    printf "\t    common , container , hdf5/1.10.7 , hdf5/aliases-1.10.7\n\n"
+}
+
+# Syntax checks.
+if   [ $# -eq 0 ] ; then
+    SyntaxMessage
+    exit 1
+elif [ ! -f $1 ] ; then
+    printf "$1:  File not found!\n\n"
+    SyntaxMessage
     exit 1
 fi
 
-# Exit if apptainer doesn't exist.
-if [ ! -f $1 ] ; then
-    echo "$1:  File not found!"
-    exit 1
-fi
-SIF=$1
+APPT="$1"   # Path to apptainer.
+INST="install -m 644 -g hpc-admins"   # File installation shorthand.
+BASE=`which $0 | awk -F'/bin' '{print $(NF-1)}'`   # Base of apptainers creation structure.
 
 # Extract information from apptainer file name.
-TEMP=`echo $1 | awk -F/ '{print $NF}'`
+TEMP=`echo $APPT | awk -F/ '{print $NF}'`
 TEMP=`echo $TEMP | sed -e 's/\.sif//'`
-V=`echo $TEMP | awk -F- '{print $NF}'`   # Version.
-C=`echo $TEMP | sed -e "s/-$V//"`	 # Name.
-
-# Infer paths to metadata & common module files (used by this script).
-TEMP=`which $0 | awk -F/ '{print $NF}'`
-TEMP=`echo $0 | sed -e "s/$TEMP//"`
-META="$TEMP/../metadata"
-MODS="$TEMP/../modules"
+VERS=`echo $TEMP | awk -F- '{print $NF}'`   # Container Version.
+CONT=`echo $TEMP | sed -e "s/-$VERS//"`     # Container (& default module) Name.
 
 # Process all command line options.
-shift
-Ppkg=0   # Python package?
-Rpkg=0   # R packages?
-MODDIR=/sw/modules
+declare -i i=0    # Just a counter.
+declare -a XTRA   # Extra packages to be searched.
+shift        # Skip past first argument.
+DFLT=0       # Default vrersion?
+NAME=$CONT   # Module name.
+MPTH=/sw/modules
 while [[ $# -gt 0 ]] ; do
     opt="$1"
     case $opt in
+	-d)
+	    DFLT=1
+	    shift
+	    ;;
 	-m)
-	    MODDIR="$2"
+	    MPTH="$2"
 	    shift
 	    shift
 	    ;;
-	-p)
-	    Ppkg=1
+	-n)
+	    NAME="$2"
+	    shift
 	    shift
 	    ;;
-	-R)
-	    Rpkg=1
+	-x)
+            XTRA[$i]="$2"
+            (( i++ ))
+	    shift
 	    shift
 	    ;;
 	*)
-	    echo "Option $1 unknown, ignoring!"
-	    shift
+	    printf "Option $1 unknown, ignoring!\n"
+	    SyntaxMessage
+	    exit 1
 	    ;;
     esac
 done
 
-# Create $MODDIR/common, if not already present
-if [ ! -f $MODDIR/common ] ; then
-    install -m 664 -g hpc-admins $MODS/common $MODDIR/
-fi
+function InstModule {
+    if [ ! -f $MPTH/$1 -o "$BASE/modules/$1" -nt "$MPTH/$1" ] ; then
+	$INST $BASE/modules/$1 $MPTH/
+    fi
+}
 
-# Create $MODDIR/container, if not already present
-if [ ! -f $MODDIR/container ] ; then
-    install -m 664 -g hpc-admins $MODS/container $MODDIR/
-fi
+InstModule "common"      # Create/Update $MPTH/common (if required)
+InstModule "container"   # Create/Update $MPTH/container (if required)
 
-# Create $MODDIR/$C/swinfo & $MODDIR/$C/$V files.
-SITE=`grep ^$C\  $META/swsites | awk '{print $2}'`
-if [ "$SITE" = "" ] ; then
-    echo "WARNING: No information for $C in $META/swsites!"
-fi
-printf "# Common modulefile for HPC software\n"   >/tmp/swinfo
-printf "set sw_name $C\nset sw_site \"$SITE\"\n" >>/tmp/swinfo
-printf "#%%Module\nset sw_vers $V\n"	    >/tmp/$V
-printf "set moduledir [file dirname \$ModulesCurrentModulefile]\n" >>/tmp/$V
-printf "source \$moduledir/swinfo\n"	   >>/tmp/$V
-printf "source \$moduledir/../common\n"	   >>/tmp/$V
-printf "source \$moduledir/../container\n" >>/tmp/$V
-printf "source \$moduledir/aliases-$V\n"   >>/tmp/$V
-install -d -m 2775 -g hpc-admins $MODDIR/$C
-install -m 664 -g hpc-admins /tmp/$V /tmp/swinfo $MODDIR/$C/
-rm -f /tmp/$V /tmp/swinfo
+# Begin creation of environment modules file.
+SITE=`grep ^$CONT\  $BASE/metadata/swsites | awk '{print $2}'`
+[[ "$SITE" = "" ]]   &&   echo "WARNING: No information for $C in $BASE/metadata/swsites!"
+printf "#%%Module\n"		  >/tmp/$VERS
+printf "set sw_name $CONT\n"	 >>/tmp/$VERS
+printf "set sw_vers $VERS\n"	 >>/tmp/$VERS
+printf "set sw_site \"$SITE\"\n" >>/tmp/$VERS
+printf "set moduledir [file dirname \$ModulesCurrentModulefile]\n" >>/tmp/$VERS
+printf "source \$moduledir/../common\n"      >>/tmp/$VERS
+printf "source \$moduledir/../container\n\n" >>/tmp/$VERS
 
-# Discovery of executables associated with container name.
-SRUN="singularity run $SIF"
+#
+# Add alias(es) suggested by $CMDS  to /tmp/$VERS file.
+#
+function CMDSaliases {
+    local X
+    for X in $CMDS ; do
+	printf "set-alias $X\t\"singularity run \$SIF $X\"\n" >>/tmp/$VERS
+    done
+}
+
+function Conda_Search {
+    local TEMP=`$SRUN find /opt/conda/pkgs -maxdepth 1 -name $1\* -type d`
+    CMDS=`$SRUN ls $TEMP/bin  2>/dev/null`
+    [[ "$CMDS" != "" ]]   &&   CMDSaliases
+}
+
+function AllCmdSearch {
+    CMDS=`$SRUN find $1 -type f -executable | grep -v unminimize | awk -F\/ '{print $NF}'`
+    [[ "$CMDS" != "" ]]   &&   CMDSaliases
+}
+
+function OneCmdSearch {
+    CMDS=`$SRUN which $1 2>/dev/null | awk -F\/ '{print $NF}'`
+    [[ "$CMDS" != "" ]]   &&   CMDSaliases
+}
+
+
+
+SRUN="singularity exec $APPT"
+printf "# SIF is defined in ../container\n" >>/tmp/$VERS
+
 $SRUN test -d /opt/conda
 if [ $? -eq 0 ] ; then
-    echo "Miniconda based container detected!"
-    CMDS=`$SRUN find /opt/conda/pkgs -maxdepth 1 -name $C-$V\* -type d`
-    CMDS=`$SRUN ls $CMDS/bin 2>/dev/null`
+
+    echo "Miniconda apptainer detected!"
+    Conda_Search "$CONT-$VERS"
+    for i in "${!XTRA[@]}" ; do 
+	Conda_Search "${XTRA[$i]}"
+	CMDSaliases
+    done
+
 else
-    # Use dpkg to discover most likely candidates
-    CMDS=`$SRUN dpkg -L $C 2>/dev/null | grep \/usr\/bin\/ | sed -e 's@/usr/bin/@@'`
-    if [ "$CMDS" != "" ] ; then
-	echo "Ubuntu based container detected (apt only)!"
-    else
-	CMDS=`$SRUN find /opt -type f -executable | awk -F\/ '{print $NF}'`
+
+    FIND=1
+    # Use dpkg to discover most likely candidates.
+    CMDS=`$SRUN dpkg -L $CONT 2>/dev/null | grep \/usr\/bin\/ | sed -e 's@/usr/bin/@@'`
+    [[ "$CMDS" != "" ]]   &&   FIND=0   &&   CMDSaliases
+    for i in "${!XTRA[@]}" ; do 
+	CMDS=`$SRUN dpkg -L ${XTRA[$i]} 2>/dev/null | grep \/usr\/bin\/ | sed -e 's@/usr/bin/@@'`
 	if [ "$CMDS" != "" ] ; then
-	    echo "Ubuntu based condtainer detected (software in /opt)!"
-	else
-	    CMDS=`$SRUN find /usr/local -type f -executable | awk -F\/ '{print $NF}'`
+	    CMDSaliases
 	    if [ "$CMDS" != "" ] ; then
-		echo "Ubuntu based condtainer detected (software in /usr/local)!"
-	    else
-		echo "No obvious executables discovered!  Use -p and/or -R"
-		echo "options to have python and/or R aliases created."
-		echo "Manual creation of aliases may be required."
+		[[ $FIND -eq 1 ]]   &&   FIND=0
 	    fi
 	fi
+    done
+
+    if [ $FIND -eq 1 ] ; then
+	echo "Aliases being created by searching /opt & /usr/local"
+        echo "Manual modification of $MPTH/$NAME/$VERS may be required!"
+	AllCmdSearch "/opt"
+	AllCmdSearch "/usr/local"
     fi
+
 fi
 
-# Create $MODDIR/$C/aliases file.
-printf "# SIF is defined in ../container\n" >/tmp/aliases
-if [ $Ppkg -eq 1 ] ; then
-    printf "set-alias python\t\"singularity run \$SIF python\"\n" >>/tmp/aliases
-    printf "set-alias python3\t\"singularity run \$SIF python3\"\n" >>/tmp/aliases
-fi
-if [ $Rpkg -eq 1 ] ; then
-    printf "set-alias R\t\"singularity run \$SIF R\"\n" >>/tmp/aliases
-    printf "set-alias Rscript\t\"singularity run \$SIF Rscript\"\n" >>/tmp/aliases
-fi
+# Add aliases for python & R, if present.
+echo "" >>/tmp/$VERS
+OneCmdSearch "python"
+OneCmdSearch "python3"
+OneCmdSearch "R"
+OneCmdSearch "Rscript"
 
-for X in $CMDS ; do
-  printf "set-alias $X\t\"singularity run \$SIF $X\"\n" >>/tmp/aliases
-done
+install -d -m 2775 -g hpc-admins $MPTH/$NAME
+/bin/rm -f $MPTH/$NAME/swinfo $MPTH/$NAME/aliases*   # Remove legacy files.
+$INST /tmp/$VERS $MPTH/$NAME/
+/bin/rm -f /tmp/$VERS
 
-install -m 664 -g hpc-admins /tmp/aliases $MODDIR/$C/aliases-$V
+if [ $DFLT -eq 1 ] ; then
+    printf "#%%Module\nset ModulesVersion $VERS\n" >$MPTH/$NAME/.version
+    chmod 664 $MPTH/$NAME/.version
+fi
