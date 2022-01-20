@@ -13,6 +13,5 @@ install -d -m 1777 -o root -g root /scratch /fast/tmp
 
 apt-get update
 apt-get install -y --no-install-recommends software-properties-common
-apt-get install -y apt-utils
-apt-get install -y SWNAME
+apt-get install -y apt-utils SWNAME
 
