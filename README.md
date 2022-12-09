@@ -37,7 +37,7 @@ but cannot provide any guarantee of bug fixes or updates.
 
 REPOSITORY CREATORS
 
-Dr. Wayne Mallett
+Dr. Whitney Mallett
 
 Mr. Wayne Spagnol
 
